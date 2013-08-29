@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/slick</path>
+    <page_callback>CRM_Slickgrid_Page_SlickGrid</page_callback>
+    <title>SlickGrid</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/slick/batch</path>
+    <page_callback>CRM_Slickgrid_Page_SlickGridBatch</page_callback>
+    <title>SlickGridBatch</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/slickgrid/batch</path>
+    <page_callback>CRM_Slickgrid_Form_SlickgridBatch</page_callback>
+    <title>SlickgridBatch</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>

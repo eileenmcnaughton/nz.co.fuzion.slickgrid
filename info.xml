@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<extension key="nz.co.fuzion.slickgrid" type="module">
+  <file>slickgrid</file>
+  <name>FIXME</name>
+  <description>FIXME</description>
+  <license>FIXME</license>
+  <maintainer>
+    <author>FIXME</author>
+    <email>FIXME@example.com</email>
+  </maintainer>
+  <releaseDate>2013-08-15</releaseDate>
+  <version>1.0</version>
+  <develStage>alpha</develStage>
+  <compatibility>
+    <ver>4.2</ver>
+  </compatibility>
+  <comments>Note that Civi appears to load these js files before it's own jquery so jquery seems to have to be loaded in it</comments>
+  <civix>
+    <namespace>CRM/Slickgrid</namespace>
+  </civix>
+</extension>
