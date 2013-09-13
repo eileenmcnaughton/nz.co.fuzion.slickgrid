@@ -152,7 +152,7 @@
 
     this.init();
   }
-  
+
   //https://github.com/stanislavgeorgiev/SlickGrid/blob/192bb52b233307c0d6d86c88bdabaa6dfecafd90/slick.editors.js
   function FloatEditor(args) {
     var $input;
@@ -215,7 +215,7 @@
 
     this.init();
   }
-  
+
   function DateEditor(args) {
     var $input;
     var defaultValue;
@@ -229,7 +229,7 @@
       $input.datepicker({
         showOn: "button",
         buttonImageOnly: true,
-        buttonImage: "../images/calendar.gif",
+        buttonImage: CRM.Setting.extensionURL + "/js/SlickGrid/images/calendar.gif",
         beforeShow: function () {
           calendarOpen = true
         },
@@ -574,7 +574,7 @@
 
     this.init();
   }
-  
+
   function SelectCellEditor(args) {
     var $select;
     var defaultValue;
