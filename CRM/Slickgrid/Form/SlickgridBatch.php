@@ -35,7 +35,7 @@ class CRM_Slickgrid_Form_SlickgridBatch extends CRM_Core_Form {
     $values = $this->exportValues();
     $fields = civicrm_api3('profile', 'getfields', array('profile_id' => $values['profile_id'], 'action' => 'submit'));
     $slickBatch = civicrm_api3('SlickBatch', 'create', array('profile_id' => $values['profile_id'], 'action' => 'submit'));
-    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/slick/grid', 'reset=1&gridid=' . $slickBatch['id']));
+    CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/civislick/grid', 'reset=1&gridid=' . $slickBatch['id']));
     parent::postProcess();
   }
 }

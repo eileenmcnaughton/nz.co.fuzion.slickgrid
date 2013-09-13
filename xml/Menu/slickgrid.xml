@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <menu>
   <item>
-    <path>civicrm/slick/batch</path>
-    <page_callback>CRM_Slickgrid_Page_SlickGridBatch</page_callback>
+    <path>civicrm/civislick/batch</path>
+    <page_callback>CRM_Slickgrid_Form_SlickGridBatch</page_callback>
     <title>SlickGrid</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>
   <item>
-    <path>civicrm/slickgrid/grid</path>
-    <page_callback>CRM_Slickgrid_Form_Slickgrid</page_callback>
+    <path>civicrm/civislick/grid</path>
+    <page_callback>CRM_Slickgrid_Page_Slickgrid</page_callback>
     <title>SlickgridBatch</title>
     <access_arguments>access CiviCRM</access_arguments>
   </item>

@@ -6,7 +6,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
   protected $profileID;
 
   function run() {
-    CRM_Utils_System::setTitle(ts('SlickGrid Data Entry'));
+    CRM_Utils_System::setTitle(ts('CiviSlick Data Entry'));
     $this->id = CRM_Utils_Request::retrieve('gridid', 'String');
     CRM_Core_Resources::singleton()
     ->addSetting(array('form' => array('grid_id' => $this->id)))
@@ -30,8 +30,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     ;
     $this->id = CRM_Utils_Request::retrieve('gridid', 'String');
     if(empty($this->id)) {
-      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/slickgrid/batch', 'reset=1'));
-
+      CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/civislick/batch', 'reset=1'));
     }
 
     $this->profileID = civicrm_api3('SlickBatch', 'getvalue', array('return' => 'profile_id', 'id' => $this->id));
