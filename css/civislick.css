@@ -19,3 +19,7 @@
     #contextMenu li:hover {
       background-color: white;
     }
+    .invalid input[type="text"]{
+      border: 1px solid #cd0a0a; 
+      background: #fef1ec url(images/ui-bg_glass_95_fef1ec_1x400.png) 50% 50% repeat-x; 
+      color: #cd0a0a; }

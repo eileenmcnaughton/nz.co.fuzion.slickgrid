@@ -20,6 +20,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/plugins/slick.cellselectionmodel.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/civislick.formatters.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/civislick.editors.js')
+    ->addScriptFile('nz.co.fuzion.slickgrid', 'js/civislick.validators.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/slick.grid.js')
     ->addStyleFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/slick.grid.css')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'templates/CRM/Slickgrid/Page/SlickGrid.js')
@@ -44,7 +45,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     foreach ($savedData['values'] as $rowNumber => $savedRow) {
       $data[$rowNumber - 1] = array_intersect_key($savedRow, $fields['values']);
     }
-
+dpm($fields);
     foreach ($fields['values'] as $field => $spec) {
       if(empty($spec['title'])) {
         continue;
@@ -57,6 +58,9 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       );
       if(isset($spec['options'])) {
         $column['options'] = $spec['options'];
+      }
+      if(isset($spec['rule'])) {
+        $column['rule'] = $spec['rule'];
       }
       $columns[] = $column;
       if(empty($savedRowCount)) {

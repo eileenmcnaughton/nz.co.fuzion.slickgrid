@@ -59,6 +59,9 @@
         columns[field]['editor'] = Slick.Editors.SelectOption;
         columns[field]['formatter'] = Slick.Formatters.Select;
       }
+      if(columns[field]['rule'] == 'email') {
+        columns[field]['validator'] = Slick.Validators.email;
+      }
     });
 
     grid = new Slick.Grid("#myGrid", data, columns, options);
