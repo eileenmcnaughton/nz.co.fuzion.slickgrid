@@ -6,7 +6,6 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
   protected $profileID;
 
   function run() {
-    CRM_Utils_System::setTitle(ts('CiviSlick Data Entry'));
     $this->id = CRM_Utils_Request::retrieve('gridid', 'String');
     CRM_Core_Resources::singleton()
     ->addSetting(array('form' => array('grid_id' => $this->id)))
@@ -37,17 +36,23 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     if($this->profileID) {
       $fields = civicrm_api3('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => $this->profileID));
     }
-
+    $profileTitle = civicrm_api3('uf_group', 'getvalue', array('return' => 'title', 'id' => $this->profileID));
+    CRM_Utils_System::setTitle(ts('CiviSlick Data Entry - profile : ' . $profileTitle));
     $columns = $data = array();
     $savedData = civicrm_api3('SlickGrid', 'get', array('grid_id' => $this->id));
     $savedRowCount = $savedData['count'];
     foreach ($savedData['values'] as $rowNumber => $savedRow) {
       $data[$rowNumber - 1] = array_intersect_key($savedRow, $fields['values']);
     }
-dpm($fields);
+
+    $addContactID = FALSE;
     foreach ($fields['values'] as $field => $spec) {
       if(empty($spec['title'])) {
         continue;
+      }
+      if(in_array(strtolower($spec['entity']), array('contribution', 'membership', 'activity', 'participant'))) {
+        //at this stage we will just always add contact id if it seems to include other entities - perhaps we should always?
+        $addContactID = TRUE;
       }
       $column = array(
         'id' => $field,
@@ -66,6 +71,16 @@ dpm($fields);
         $data[$savedRowCount][$field] = CRM_Utils_Array::value('default_value', $spec, '');
       }
     }
+
+    if($addContactID) {
+      array_unshift($columns, array(
+        'id' => 'contact_id',
+        'name' => 'Contact',
+        'field' => 'contact_id',
+        'editor' => 5000,// using integer since other types are integers- maps to contact select
+      ));
+    }
+
     $config = CRM_Core_Config::singleton();
     $resourceURL = $config->extensionsURL . '/nz.co.fuzion.slickgrid';
     CRM_Core_Resources::singleton()->addSetting(array(

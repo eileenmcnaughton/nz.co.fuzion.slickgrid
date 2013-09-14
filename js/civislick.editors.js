@@ -17,7 +17,8 @@
         "Checkbox": CheckboxEditor,
         "PercentComplete": PercentCompleteEditor,
         "LongText": LongTextEditor,
-        "SelectOption": SelectCellEditor
+        "SelectOption": SelectCellEditor,
+        "SelectContact": SelectContactEditor
       }
     }
   });
@@ -635,5 +636,129 @@
 
     this.init();
   }
+
+    /*
+     * An example of a "detached" editor.
+     * The UI is added onto document BODY and .position(), .show() and .hide() are implemented.
+     * KeyDown events are also handled to provide handling for Tab, Shift-Tab, Esc and Ctrl-Enter.
+     */
+    function SelectContactEditor(args) {
+        var $input, $wrapper;
+        var defaultValue;
+        var scope = this;
+
+        this.init = function () {
+            var $container = $("body");
+            var gid = 1;
+            $('<div></div>').attr("id", 'dialogId');
+            var dataURL = CRM.url('civicrm/profile/create', 'reset=1&snippet=5&context=dialog&prefix=&gid=' + gid);
+            $.ajax({
+                url: dataURL,
+                success: function( content ) {
+                  $('#dialogId').show( ).html( content ).dialog({
+                        title: ts("Create New Contact"),
+                        modal: true,
+                        width: 680,
+                        appendTo: $container,
+                        overlay: {
+                           opacity: 0.5,
+                           background: "black"
+                        },
+
+                        close: function(event, ui) {
+                            alert('toodledoo');
+                        }
+                    });
+                }
+            });
+            $wrapper = $("<DIV style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
+                ;
+
+            $input = $("<TEXTAREA hidefocus rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
+                .appendTo($wrapper);
+
+            $("<DIV style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
+                .appendTo($wrapper);
+
+            $wrapper.find("button:first").bind("click", this.save);
+            $wrapper.find("button:last").bind("click", this.cancel);
+            $input.bind("keydown", this.handleKeyDown);
+
+            scope.position(args.position);
+            $input.focus().select();
+        };
+
+        this.handleKeyDown = function (e) {
+            if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
+                scope.save();
+            } else if (e.which == $.ui.keyCode.ESCAPE) {
+                e.preventDefault();
+                scope.cancel();
+            } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
+                e.preventDefault();
+                args.grid.navigatePrev();
+            } else if (e.which == $.ui.keyCode.TAB) {
+                e.preventDefault();
+                args.grid.navigateNext();
+            }
+        };
+
+        this.save = function () {
+            args.commitChanges();
+        };
+
+        this.cancel = function () {
+            $input.val(defaultValue);
+            args.cancelChanges();
+        };
+
+        this.hide = function () {
+            $wrapper.hide();
+        };
+
+        this.show = function () {
+            $wrapper.show();
+        };
+
+        this.position = function (position) {
+            $wrapper
+                .css("top", position.top - 5)
+                .css("left", position.left - 5)
+        };
+
+        this.destroy = function () {
+            $wrapper.remove();
+        };
+
+        this.focus = function () {
+            $input.focus();
+        };
+
+        this.loadValue = function (item) {
+            $input.val(defaultValue = item[args.column.field]);
+            $input.select();
+        };
+
+        this.serializeValue = function () {
+            return $input.val();
+        };
+
+        this.applyValue = function (item, state) {
+            item[args.column.field] = state;
+        };
+
+        this.isValueChanged = function () {
+            return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
+        };
+
+        this.validate = function () {
+            return {
+                valid: true,
+                msg: null
+            };
+        };
+
+        this.init();
+    }
 
 })(jQuery);

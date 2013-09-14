@@ -5,11 +5,11 @@
       return {valid: true, msg: null};
     }
   }
-  
+
   function formatter(row, cell, value, columnDef, dataContext) {
     return value;
   }
-  
+
   /**
    * Translate CiviCRM field type to slickgrid editor type
    * @param string $type
@@ -19,7 +19,8 @@
       4 : Slick.Editors.Date,
       12 : Slick.Editors.Date,
       16 : Slick.Editors.Checkbox,
-      1024 : Slick.Editors.Float
+      1024 : Slick.Editors.Float,
+      5000 : Slick.Editors.SelectContact
     };
 
     if(types[type]) {
@@ -28,8 +29,8 @@
     //1024 - money
     return Slick.Editors.Text;
   }
-  
-  
+
+
   var grid;
   var columns = CRM.Form.Columns;
 
@@ -39,7 +40,7 @@
     enableAddRow: true,
     editable: true
   };
-  
+
   $('#crm-btn-process').on('click', function(){
     CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id})
   });
@@ -66,8 +67,8 @@
 
     grid = new Slick.Grid("#myGrid", data, columns, options);
     grid.setSelectionModel(new Slick.CellSelectionModel());
-    
-    grid.onCellChange.subscribe(function (e, args) { 
+
+    grid.onCellChange.subscribe(function (e, args) {
       var cell = grid.getCellFromEvent(e);
       if (typeof(args.item.id)=='undefined') {
         var columnName = grid.getColumns()[args.cell].id;
@@ -83,7 +84,7 @@
       }
 
     });
-     
+
     grid.onAddNewRow.subscribe(function (e, args) {
       var item = args.item;//CRM.api('SlickGrid', 'create', params);
       grid.invalidateRow(data.length);
