@@ -109,7 +109,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       $fields = civicrm_api3('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => $profile));
       $newProfileFields[$profile] = $fields['values'];
     }
-
+    $this->assignAddressLookupData();
     $this->assign('gridWidth', $totalWidth);
     $config = CRM_Core_Config::singleton();
     $resourceURL = $config->extensionsURL . '/nz.co.fuzion.slickgrid';
@@ -185,5 +185,15 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
 
    }
    return $contactFields;
-}}
+}
+/**
+ * Currently just google & 'on' but will allow 'off'/ others
+ */
+ function assignAddressLookupData() {
+ $domainContact = civicrm_api3('domain', 'get', array('current_domain' => 1, 'sequential' => 1));
+ CRM_Core_Resources::singleton()->addScriptURL('http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false')
+ ->addSetting(array('Domain' => $domainContact['values'][0]['domain_address']))
+ ;
+ }
+}
 
