@@ -13,6 +13,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/lib/jquery.event.drag-2.2.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/slick.core.js')
+    ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/slick.dataview.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/plugins/slick.cellrangedecorator.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/plugins/slick.cellrangeselector.js')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/plugins/slick.cellselectionmodel.js')
