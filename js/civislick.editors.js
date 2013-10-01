@@ -608,7 +608,7 @@
 
     this.loadValue = function(item) {
       defaultValue = item[args.column.field];
-        $select.val(defaultValue);
+      $select.val(defaultValue);
     };
 
     this.serializeValue = function() {
