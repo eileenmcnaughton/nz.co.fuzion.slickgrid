@@ -56,7 +56,7 @@
   }
 
   function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
-    return value ? "<img src='" + CRM.Setting.extensionURL + "/js/SlickGrid/images/tick.png'>" : "";
+    return value ? "<img src='" + CRM.Setting.extensionURL + "/packages/SlickGrid/images/tick.png'>" : "";
   }
 
   function SelectFormatter(row, cell, value, columnDef, dataContext) {

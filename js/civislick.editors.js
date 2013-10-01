@@ -230,7 +230,7 @@
       $input.datepicker({
         showOn: "button",
         buttonImageOnly: true,
-        buttonImage: CRM.Setting.extensionURL + "/js/SlickGrid/images/calendar.gif",
+        buttonImage: CRM.Setting.extensionURL + "/packages/SlickGrid/images/calendar.gif",
         beforeShow: function () {
           calendarOpen = true
         },
