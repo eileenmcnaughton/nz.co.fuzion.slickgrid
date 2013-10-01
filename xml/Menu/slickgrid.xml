@@ -8,7 +8,7 @@
   </item>
   <item>
     <path>civicrm/civislick/grid</path>
-    <page_callback>CRM_Slickgrid_Page_Slickgrid</page_callback>
+    <page_callback>CRM_Slickgrid_Page_SlickGrid</page_callback>
     <title>CiviSlick Grid</title>
     <access_arguments>administer CiviCRM</access_arguments>
   </item>
