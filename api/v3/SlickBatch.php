@@ -49,8 +49,12 @@ function civicrm_api3_slick_batch_create($params) {
 }
 
 function civicrm_api3_slick_batch_get($params) {
+  $where = '';
   //@todo - preliminary code - needs re-writing with BAO
-  $sql = "SELECT id, profile_id, temp_table FROM civicrm_slickbatch WHERE id = " . $params['id'];
+  if(!empty($params['id'])) {
+    $where = " WHERE id = " . $params['id'];
+  }
+  $sql = "SELECT id, profile_id, temp_table FROM civicrm_slickbatch $where";
   $dao = CRM_Core_DAO::executeQuery($sql);
   $values = array();
   while($dao->fetch()) {
