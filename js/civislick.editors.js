@@ -679,7 +679,9 @@
           if(args.item[args.column.field]) {
             buildContactForm($input, args.item[args.column.field]);
           }
-          $('#new_contact').on('change', buildContactForm($('#editor-autocomplete')));
+          $('#new_contact').on('change', function(){
+            buildContactForm($('#editor-autocomplete'));
+          });
         };
 
 
