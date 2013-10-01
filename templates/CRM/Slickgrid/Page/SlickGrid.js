@@ -35,7 +35,7 @@ cj(function ($) {
 
   var grid;
   var columns = CRM.Form.Columns;
-
+  var sortcol = 'id';
   var options = {
     enableCellNavigation: true,
     enableColumnReorder: true,
@@ -99,7 +99,9 @@ cj(function ($) {
       grid.editActiveCell(compositeEditor);
   }
   $('#crm-btn-process').on('click', function(){
-    CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id})
+    CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id}), function(result) {
+
+    }
   });
  // $(function () {
 
@@ -126,62 +128,47 @@ cj(function ($) {
 
     var dataView = new Slick.Data.DataView();
     grid = new Slick.Grid("#myGrid", dataView, columns, options);
-    dataView.beginUpdate();
-    console.log(CRM.Form.Data);
-    dataView.setItems(CRM.Form.Data);
-
-    dataView.endUpdate();
     grid.setSelectionModel(new Slick.CellSelectionModel());
+
+    //this line probably applies only if we switch to RowSelectionModel
+    // which I tried because of the sync fn per below but not working
+    //https://github.com/mleibman/SlickGrid/wiki/DataView
+    grid.onSelectedRowsChanged.subscribe(function() { console.log(grid.getSelectedRows()); });
 
     grid.onCellChange.subscribe(function (e, args) {
       var cell = grid.getCellFromEvent(e);
-      if (typeof(args.item.id)=='undefined') {
-        var columnName = grid.getColumns()[args.cell].id;
-        var input = data[args.row][grid.getColumns()[args.cell].field];
-        var row = args.row;
-        var params = {'id' : row + 1};
-        if(args.item[columnName + '_name']) {
-          params[columnName + '_name'] = args.item[columnName + '_name'];
-        }
-        params[columnName] = input;
-        params['grid_id'] = CRM.form.grid_id;
-        CRM.api('SlickGrid', 'create', params);
+      var columnName = grid.getColumns()[args.cell].id;
+      var input = data[args.row][grid.getColumns()[args.cell].field];
+      var row = args.row;
+      var params = {'id' : args.item['id']};
+      if(args.item[columnName + '_name']) {
+        params[columnName + '_name'] = args.item[columnName + '_name'];
       }
-      else{
-        // dunno - ??? - what does the if achieved - I chopped & pilfered it
-      }
-
+      params[columnName] = input;
+      params['grid_id'] = CRM.form.grid_id;
+      CRM.api('SlickGrid', 'create', params);
+      dataView.updateItem(args.item.id, args.item);
     });
 
     grid.onAddNewRow.subscribe(function (e, args) {
       var item = args.item;//CRM.api('SlickGrid', 'create', params);
-      grid.invalidateRow(data.length);
-      data.push(item);
-      grid.updateRowCount();
       var numberOfRows = grid.getDataLength();
       var params = args.item;
-      params['id'] = numberOfRows;
+      params['id'] = numberOfRows + 1;
       params['grid_id'] = CRM.form.grid_id;
-      console.log('in grid sub');
       CRM.api('SlickGrid', 'create', params);
-      grid.render();
+      var row = dataView.getItem(args.row);
+      dataView.addItem(item);
     });
 
 
  // wire up model events to drive the grid
     dataView.onRowCountChanged.subscribe(function (e, args) {
-      var item = args.item;//CRM.api('SlickGrid', 'create', params);
-      var params = args.item;
-      params['id'] = numberOfRows;
-      params['grid_id'] = CRM.form.grid_id;
-      console.log('in data sub');
-      CRM.api('SlickGrid', 'create', params);
       grid.updateRowCount();
       grid.render();
     });
 
     dataView.onRowsChanged.subscribe(function (e, args) {
-      console.log(args);
       grid.invalidateRows(args.rows);
       grid.render();
     });
@@ -196,6 +183,7 @@ cj(function ($) {
     });
 
     grid.onSort.subscribe(function (e, args) {
+      console.log(args);
       sortcol = args.sortCol.field;  // Maybe args.sortcol.field ???
       dataView.sort(comparer, args.sortAsc);
     });
@@ -204,5 +192,8 @@ cj(function ($) {
       var x = a[sortcol], y = b[sortcol];
       return (x == y ? 0 : (x > y ? 1 : -1));
     }
+    dataView.beginUpdate();
+    dataView.setItems(CRM.Form.Data);
+    dataView.endUpdate();
   })
 

@@ -51,7 +51,6 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     CRM_Utils_System::setTitle(ts('CiviSlick Data Entry - profile : ' . $profileTitle));
     $columns = $data = array();
     $savedData = civicrm_api3('SlickGrid', 'get', array('grid_id' => $this->id));
-    dpm($savedData);
     $savedRowCount = $savedData['count'];
     foreach ($savedData['values'] as $rowNumber => $savedRow) {
       $data[$rowNumber - 1] = array_intersect_key($savedRow, $fields);
@@ -84,6 +83,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
         'field' => $field,
         'editor' => $spec['type'],
         'width' => $width,
+        'sortable' => TRUE,
       );
       if(isset($spec['options'])) {
         $column['options'] = $spec['options'];
