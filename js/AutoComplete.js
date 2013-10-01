@@ -53,7 +53,7 @@ function buildContactForm(customObj, contactID) {
 
           cj.each(result.values, function (id, value){
             var profilehtml = '<div class="crm-entity" data-entity="contact" data-id=' + contactID + '><table>';
-              cj.each(CRM.Profile.new_individual, function (fieldname, fieldvalue) {
+              cj.each(CRM.Profile[profileID], function (fieldname, fieldvalue) {
                 primaryFieldName = fieldname + '-primary';
                 if(!fieldvalue.name || -1 == ($.inArray(fieldvalue.entity, ['address', 'email', 'phone', 'contact']))) {
                   return;
