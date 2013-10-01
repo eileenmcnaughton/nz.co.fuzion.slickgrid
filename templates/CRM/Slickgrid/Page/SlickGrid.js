@@ -1,3 +1,5 @@
+cj(function ($) {
+  'use strict';
   function requiredFieldValidator(value) {
     if (value == null || value == undefined || !value.length) {
       return {valid: false, msg: "This is a required field"};
@@ -99,8 +101,8 @@
   $('#crm-btn-process').on('click', function(){
     CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id})
   });
+ // $(function () {
 
-  $(function () {
     var data = CRM.Form.Data;
     $.each(columns, function(field, specs){
       if(columns[field]['editor'] == 1024) {
@@ -122,7 +124,13 @@
       }
     });
 
-    grid = new Slick.Grid("#myGrid", data, columns, options);
+    var dataView = new Slick.Data.DataView();
+    grid = new Slick.Grid("#myGrid", dataView, columns, options);
+    dataView.beginUpdate();
+    console.log(CRM.Form.Data);
+    dataView.setItems(CRM.Form.Data);
+
+    dataView.endUpdate();
     grid.setSelectionModel(new Slick.CellSelectionModel());
 
     grid.onCellChange.subscribe(function (e, args) {
@@ -154,7 +162,47 @@
       var params = args.item;
       params['id'] = numberOfRows;
       params['grid_id'] = CRM.form.grid_id;
+      console.log('in grid sub');
       CRM.api('SlickGrid', 'create', params);
       grid.render();
     });
+
+
+ // wire up model events to drive the grid
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+      var item = args.item;//CRM.api('SlickGrid', 'create', params);
+      var params = args.item;
+      params['id'] = numberOfRows;
+      params['grid_id'] = CRM.form.grid_id;
+      console.log('in data sub');
+      CRM.api('SlickGrid', 'create', params);
+      grid.updateRowCount();
+      grid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+      console.log(args);
+      grid.invalidateRows(args.rows);
+      grid.render();
+    });
+
+    // When user clicks button, fetch data via Ajax, and bind it to the dataview.
+    $('#mybutton').click(function() {
+        CRM.api('slick_grid','get', {'grid_id' : 26}, function(data) {
+        dataView.beginUpdate();console,log(data);
+        dataView.setItems(CRM.Form.Data);
+        dataView.endUpdate();
+      });
+    });
+
+    grid.onSort.subscribe(function (e, args) {
+      sortcol = args.sortCol.field;  // Maybe args.sortcol.field ???
+      dataView.sort(comparer, args.sortAsc);
+    });
+
+    function comparer(a, b) {
+      var x = a[sortcol], y = b[sortcol];
+      return (x == y ? 0 : (x > y ? 1 : -1));
+    }
   })
+

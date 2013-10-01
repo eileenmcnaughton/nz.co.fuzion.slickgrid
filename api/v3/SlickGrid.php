@@ -47,7 +47,6 @@ function civicrm_api3_slick_grid_get($params) {
         $values[$dao->grid_id][str_replace('__', '-', $field)] = $value;
       }
     }
-    unset($values[$dao->grid_id]['grid_id']);
   }
   return civicrm_api3_create_success($values, $params);
 }

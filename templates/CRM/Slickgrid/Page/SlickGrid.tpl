@@ -3,7 +3,6 @@
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
   <title>Data entry Grid</title><button id='crm-btn-process' class = 'crm-button'>Process</button>
-  <button onclick="openDetails()">Open Item Edit for active row</button>
 </head>
 <body>
 <table width="100%">

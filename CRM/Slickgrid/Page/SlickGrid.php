@@ -13,6 +13,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/lib/jquery-ui-1.8.16.custom.min.js', 2)
     ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/lib/jquery.event.drag-2.2.js', 3)
     ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/slick.core.js', 4)
+    ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/slick.dataview.js', 5)
     ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/plugins/slick.cellrangedecorator.js', 5)
     ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/plugins/slick.cellrangeselector.js', 6)
     ->addScriptFile('nz.co.fuzion.slickgrid', 'packages/SlickGrid/plugins/slick.cellselectionmodel.js', 7)
@@ -50,9 +51,11 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     CRM_Utils_System::setTitle(ts('CiviSlick Data Entry - profile : ' . $profileTitle));
     $columns = $data = array();
     $savedData = civicrm_api3('SlickGrid', 'get', array('grid_id' => $this->id));
+    dpm($savedData);
     $savedRowCount = $savedData['count'];
     foreach ($savedData['values'] as $rowNumber => $savedRow) {
       $data[$rowNumber - 1] = array_intersect_key($savedRow, $fields);
+      $data[$rowNumber - 1]['id'] = $savedRow['grid_id'];
       foreach ($contactFields as $idField => $nameField) {
         $data[$rowNumber - 1][$nameField] = $savedRow[$nameField];
       }
