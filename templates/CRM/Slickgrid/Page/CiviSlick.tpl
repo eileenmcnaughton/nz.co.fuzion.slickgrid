@@ -5,7 +5,7 @@ of completed ones - esp for deposit slips</p>
 
 <table>
  {foreach from=$batches key=id item=batch}
-  <tr><td><a href ='{$batch.url}'>{$batch.profile}</a></td></tr>
+  <tr><td><a href ='{$batch.url}'>{$batch.profile}</a></td><td><button data-gridid={$batch.id}>Delete</button></td></tr>
  {/foreach}
 </table>
 

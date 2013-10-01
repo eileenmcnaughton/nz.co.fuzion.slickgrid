@@ -12,6 +12,7 @@ class CRM_Slickgrid_Page_CiviSlick extends CRM_Core_Page {
     $batch['url'] = CRM_Utils_System::url('civicrm/civislick/grid', "reset=1&gridid={$batch['id']}");
   }
   $this->assign('batches', $batches['values']);
+  CRM_Core_Resources::singleton()->addScriptFile('nz.co.fuzion.slickgrid', 'templates/CRM/Slickgrid/Page/CiviSlick');
   parent::run();
  }
 }
