@@ -4,7 +4,7 @@ function civicrm_api3_slick_grid_create($params) {
   //@todo - preliminary code - needs re-writing with BAO
   $tempTable = civicrm_api3('SlickBatch', 'getvalue', array('id' => $params['grid_id'], 'return' => 'temp_table'));
   $id = $params['id'];
-  $ignoredKeys = array('id', 'grid_id', 'check_permissions', 'version');
+  $ignoredKeys = array('id', 'grid_id', 'check_permissions', 'version', 'IDS_request_uri', 'IDS_user_agent');
   $fields = array_diff_key($params, array_fill_keys($ignoredKeys, 1));
   //@todo get rid of all this crap & sort out the escaping
   $exists = CRM_Core_DAO::singleValueQuery(" SELECT count(*) FROM $tempTable WHERE grid_id = " . $params['id']);
