@@ -63,7 +63,7 @@
     if(columnDef.options[value]) {
       return columnDef.options[value];
     }
-    console.log('here');
+    return '';
   }
 
   function CurrencyFormatter(row, cell, value, columnDef, dataContext) {
