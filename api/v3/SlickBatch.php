@@ -34,15 +34,16 @@ function civicrm_api3_slick_batch_create($params) {
   $sql = "CREATE TABLE $table ( grid_id INT(10) UNSIGNED NOT NULL,
     $fieldStatement
   )";
-
-  CRM_Core_DAO::executeQuery($sql);
-
-  $sql = "INSERT INTO civicrm_slickbatch (profile_id, temp_table) values({$params['profile_id']}, '{$table}')";
-
-  CRM_Core_DAO::executeQuery($sql);
-
-  $sql = "SELECT MAX(id) from  civicrm_slickbatch";
-  $id = CRM_Core_DAO::singleValueQuery($sql);
+  try{
+    CRM_Core_DAO::executeQuery($sql);
+    $sql = "INSERT INTO civicrm_slickbatch (profile_id, temp_table) values({$params['profile_id']}, '{$table}')";
+    CRM_Core_DAO::executeQuery($sql);
+    $sql = "SELECT MAX(id) from  civicrm_slickbatch";
+    $id = CRM_Core_DAO::singleValueQuery($sql);
+  }
+  catch(EXCEPTION $e) {
+   throw new API_Exception ('could not execute '. $sql);
+  }
   return civicrm_api3_create_success(array($id => array('id' => $id)));
 
 }
