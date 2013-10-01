@@ -80,3 +80,43 @@ function slickgrid_civicrm_upgrade($op, CRM_Queue_Queue $queue = NULL) {
 function slickgrid_civicrm_managed(&$entities) {
   return _slickgrid_civix_civicrm_managed($entities);
 }
+
+function slickgrid_civicrm_navigationMenu(&$menu) {
+ $maxID = CRM_Core_DAO::singleValueQuery("SELECT max(id) FROM civicrm_navigation");
+ $navId = $maxID + 1;
+ $menu[$navId] = array (
+   'attributes' => array (
+     'label' => 'CiviSlick',
+     'name' => 'CiviSlick',
+     'url' => null,
+     'permission' => 'administer CiviCRM',
+     'operator' => null,
+     'separator' => null,
+     'parentID' => null,
+     'active' => 1,
+   ),
+   'child' => array (
+     $navId+1 => array(
+         'attributes' => array(
+       'label' => 'CiviSlick',
+       'name' => 'CiviSlick',
+       'url' => 'civicrm/civislick',
+       'permission' => 'administer CiviCRM',
+         'operator' => null,
+         'separator' => 1,
+         'active' => 1,
+       'parentID'   => $navId,
+     ),),
+     $navId+2 => array (
+       'attributes' => array(
+         'label' => 'CiviSlick Batch',
+         'name' => 'CiviSlick Batch',
+         'url' => 'civicrm/civislick/batch',
+         'permission' => 'administer CiviCRM',
+         'operator' => null,
+         'separator' => 1,
+         'active' => 1,
+         'parentID'   => $navId,
+     )))
+ );
+}

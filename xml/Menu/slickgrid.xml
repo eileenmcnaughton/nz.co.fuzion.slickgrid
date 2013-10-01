@@ -2,14 +2,20 @@
 <menu>
   <item>
     <path>civicrm/civislick/batch</path>
-    <page_callback>CRM_Slickgrid_Form_SlickGridBatch</page_callback>
-    <title>CiviSlick Grid</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <page_callback>CRM_Slickgrid_Form_SlickgridBatch</page_callback>
+    <title>CiviSlick Batch</title>
+    <access_arguments>administer CiviCRM</access_arguments>
   </item>
   <item>
     <path>civicrm/civislick/grid</path>
     <page_callback>CRM_Slickgrid_Page_Slickgrid</page_callback>
-    <title>CiviSlick Batch</title>
-    <access_arguments>access CiviCRM</access_arguments>
+    <title>CiviSlick Grid</title>
+    <access_arguments>administer CiviCRM</access_arguments>
+  </item>
+  <item>
+    <path>civicrm/civislick</path>
+    <page_callback>CRM_Slickgrid_Page_CiviSlick</page_callback>
+    <title>CiviSlick</title>
+    <access_arguments>administer CiviCRM</access_arguments>
   </item>
 </menu>
