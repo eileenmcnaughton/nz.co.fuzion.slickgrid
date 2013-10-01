@@ -14,7 +14,7 @@
   <compatibility>
     <ver>4.4</ver>
   </compatibility>
-  <comments>Note that Civi appears to load these js files before it's own jquery so jquery seems to have to be loaded in it</comments>
+  <comments>See Readme for technical notes</comments>
   <civix>
     <namespace>CRM/Slickgrid</namespace>
   </civix>
