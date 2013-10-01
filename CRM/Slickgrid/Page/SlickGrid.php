@@ -1,9 +1,8 @@
 <?php
 
-require_once 'CRM/Core/Page.php';
-
 class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
   protected $profileID;
+  protected $id;
 
   function run() {
     $this->id = CRM_Utils_Request::retrieve('gridid', 'String');
@@ -23,9 +22,16 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/slick.grid.js')
     ->addStyleFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/slick.grid.css')
     ->addScriptFile('nz.co.fuzion.slickgrid', 'templates/CRM/Slickgrid/Page/SlickGrid.js')
+   // ->addScriptFile('nz.co.fuzion.slickgrid', 'templates/CRM/Slickgrid/Page/contactEditor.js')// can't add like this as need to set script type
     ->addStyleFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/css/smoothness/jquery-ui-1.8.16.custom.css')
     ->addStyleFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/examples/examples.css')
     ->addStyleFile('nz.co.fuzion.slickgrid', 'css/civislick.css')
+    ->addScriptFile('nz.co.fuzion.slickgrid', 'js/SlickGrid/examples/slick.compositeeditor.js')
+    ->addScriptFile('nz.co.fuzion.slickgrid', 'js/jquery.tmpl.min.js')
+    ->addScriptFile('nz.co.fuzion.slickgrid', 'js/AutoComplete.js')
+    ->addStyleFile('nz.co.fuzion.slickgrid', 'css/inlineEditor.css')
+    ->addScriptFile('civicrm', 'js/jquery/jquery.crmeditable.js')
+    ->addScriptURL('http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false');
     ;
     $this->id = CRM_Utils_Request::retrieve('gridid', 'String');
     if(empty($this->id)) {
@@ -36,29 +42,45 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     if($this->profileID) {
       $fields = civicrm_api3('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => $this->profileID));
     }
+    $fields = $fields['values'];
+    $contactFields = $this->getContactFields($fields);
+    $this->appendContactFields($fields, $contactFields);
+
     $profileTitle = civicrm_api3('uf_group', 'getvalue', array('return' => 'title', 'id' => $this->profileID));
     CRM_Utils_System::setTitle(ts('CiviSlick Data Entry - profile : ' . $profileTitle));
     $columns = $data = array();
     $savedData = civicrm_api3('SlickGrid', 'get', array('grid_id' => $this->id));
     $savedRowCount = $savedData['count'];
     foreach ($savedData['values'] as $rowNumber => $savedRow) {
-      $data[$rowNumber - 1] = array_intersect_key($savedRow, $fields['values']);
+      $data[$rowNumber - 1] = array_intersect_key($savedRow, $fields);
+      foreach ($contactFields as $idField => $nameField) {
+        $data[$rowNumber - 1][$nameField] = $savedRow[$nameField];
+      }
     }
 
-    $addContactID = FALSE;
-    foreach ($fields['values'] as $field => $spec) {
+    $totalWidth = 0;
+    foreach ($fields as $field => $spec) {
       if(empty($spec['title'])) {
         continue;
       }
-      if(in_array(strtolower($spec['entity']), array('contribution', 'membership', 'activity', 'participant'))) {
-        //at this stage we will just always add contact id if it seems to include other entities - perhaps we should always?
-        $addContactID = TRUE;
+      $width = 0;
+      if(isset($spec['options'])) {
+        foreach ($spec['options'] as $option) {
+           if(strlen($option) > $width) {
+            $width = strlen($option);
+           }
+        }
       }
+      if(CRM_Utils_Array::value('size', $spec) > $width) {
+       $width = $spec['size'];
+      }
+      $width += 80;
       $column = array(
         'id' => $field,
         'name' => $spec['title'],
         'field' => $field,
         'editor' => $spec['type'],
+        'width' => $width,
       );
       if(isset($spec['options'])) {
         $column['options'] = $spec['options'];
@@ -70,29 +92,98 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       if(empty($savedRowCount)) {
         $data[$savedRowCount][$field] = CRM_Utils_Array::value('default_value', $spec, '');
       }
+      $totalWidth += $width;
     }
 
-    if($addContactID) {
+   /* if($addContactID) {
       array_unshift($columns, array(
-        'id' => 'contact_id',
+        'id' => 'contact_id_name',
         'name' => 'Contact',
-        'field' => 'contact_id',
+        'field' => 'contact_id_name',
         'editor' => 5000,// using integer since other types are integers- maps to contact select
       ));
+    }*/
+    $newProfiles = array('new_individual', 'new_organization', 'new_household');
+    $newProfileFields = array();
+    foreach ($newProfiles as $index => $profile) {
+      $fields = civicrm_api3('profile', 'getfields', array('get_options' => 'all', 'action' => 'submit', 'profile_id' => $profile));
+      $newProfileFields[$profile] = $fields['values'];
     }
 
+    $this->assign('gridWidth', $totalWidth);
     $config = CRM_Core_Config::singleton();
     $resourceURL = $config->extensionsURL . '/nz.co.fuzion.slickgrid';
     CRM_Core_Resources::singleton()->addSetting(array(
       'Form' => array(
         'Columns' => $columns,
-        'Data' => $data
+        'Data' => $data,
       ),
       'Setting' => array(
         'extensionURL' => $resourceURL,
-      )
+      ),
+      'Profile' => $newProfileFields,
     ));
 
     parent::run();
   }
-}
+
+  /**
+   * We will add on fields for the contact_id if required & the display name for any other contact id fields
+   * @param array $fields
+   */
+  function appendContactFields(&$fields) {
+   $addContactID = FALSE;
+   foreach ($fields as $profileField => $specs) {
+    if($profileField == 'profile_id') {
+     continue;
+    }
+    if(in_array(strtolower($specs['entity']), array('contribution', 'membership', 'activity', 'participant'))) {
+     //at this stage we will just always add contact id if it seems to include other entities - perhaps we should always?
+     $addContactID = TRUE;
+    }
+    if(CRM_Utils_Array::value('FKClassName', $specs) ==  'CRM_Contact_DAO_Contact') {
+      $fields[$profileField]['type'] = 5000;
+      $fields[$profileField]['name_field'] = $profileField . '_name';
+      $fields[$profileField]['name_field'] = $profileField . '_name';
+    }
+    if(CRM_Utils_Array::value('data_type',$specs) ==  'ContactReference') {
+      $fields[$profileField]['type'] = 5000;
+    }
+
+   }
+   if($addContactID) {
+     $fields = array_merge(array(
+       'contact_id' => array('title' => 'Contact', 'type' => 5000,
+         'size' => 60,
+         'entity' => 'contact',
+         'name_field' => 'contact_id_name',
+       ),
+      // 'contact_id_name' => array('title' => 'Contact', 'type' => 5000)
+     ), $fields);
+   }
+  }
+
+  /**
+   * Get a list of fields that will have a lookup
+   * @param unknown $fields
+   */
+  function getContactFields($fields) {
+   $contactFields = array();
+   foreach ($fields as $profileField => $specs) {
+    if($profileField == 'profile_id') {
+     continue;
+    }
+    if(in_array(strtolower($specs['entity']), array('contribution', 'membership', 'activity', 'participant'))) {
+     //at this stage we will just always add contact id if it seems to include other entities - perhaps we should always?
+     $contactFields['contact_id'] = 'contact_id_name';
+    }
+    if(CRM_Utils_Array::value('FKClassName', $specs) ==  'CRM_Contact_DAO_Contact'
+      || CRM_Utils_Array::value('data_type',$specs) ==  'ContactReference'
+    ) {
+     $contactFields[$profileField] = $profileField . '_name';
+    }
+
+   }
+   return $contactFields;
+}}
+

@@ -1,15 +1,32 @@
 <?php
-
+/**
+ * Create slickbatch - this is in proof of concept stage & needs a big tidy up to look like a 'normal' api
+ * @param $params
+ *
+ * @return mixed
+ */
 function civicrm_api3_slick_batch_create($params) {
   //@todo - preliminary code - needs re-writing with BAO
 
   $fields = civicrm_api3('profile', 'getfields', array('profile_id' => $params['profile_id'], 'action' => 'submit'));
-  $fieldStatements = array();
+  $fieldStatements = $entities = array();
   foreach ($fields['values'] as $fieldName => $specs) {
     if($fieldName == 'profile_id') {
       continue;
     }
+    $entities[$specs['entity']] = 1;
     $fieldStatements[] =  str_replace('-', '__', $fieldName) . _civicrm_api3_getfieldsqlstring($specs['type']);
+    if(CRM_Utils_Array::value('FKClassName',$specs) ==  'CRM_Contact_DAO_Contact'
+      || CRM_Utils_Array::value('data_type',$specs) ==  'ContactReference'
+    ) {
+      // we will store display name so we can sanely interact with it
+      $fieldStatements[]  = $fieldName . '_name'   . " VARCHAR(255) NULL ";
+    }
+  }
+  $nonContactEntities = array('activity', 'participant', 'membership', 'contribution');//centralise me
+  if(array_intersect_key($entities, array_fill_keys($nonContactEntities, 1))) {
+    $fieldStatements[] = 'contact_id ' . _civicrm_api3_getfieldsqlstring(1);
+    $fieldStatements[]  = 'contact_id_name'   . " VARCHAR(255) NULL ";
   }
   $fieldStatement = implode(' , ', $fieldStatements);
   //do we rename id ? needs to be unique but current implementation (hackery) is no autoincrement
@@ -21,6 +38,7 @@ function civicrm_api3_slick_batch_create($params) {
   CRM_Core_DAO::executeQuery($sql);
 
   $sql = "INSERT INTO civicrm_slickbatch (profile_id, temp_table) values({$params['profile_id']}, '{$table}')";
+
   CRM_Core_DAO::executeQuery($sql);
 
   $sql = "SELECT MAX(id) from  civicrm_slickbatch";

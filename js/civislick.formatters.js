@@ -1,9 +1,9 @@
 /***
  * Contains basic SlickGrid formatters.
- * 
+ *
  * NOTE:  These are merely examples.  You will most likely need to implement something more
  *        robust/extensible/localizable/etc. for your use!
- * 
+ *
  * @module Formatters
  * @namespace Slick
  */
@@ -17,7 +17,8 @@
         "PercentCompleteBar": PercentCompleteBarFormatter,
         "YesNo": YesNoFormatter,
         "Checkmark": CheckmarkFormatter,
-        "Select" : SelectFormatter
+        "Select" : SelectFormatter,
+        "Contact" : ContactFormatter,
       }
     }
   });
@@ -57,11 +58,14 @@
   function CheckmarkFormatter(row, cell, value, columnDef, dataContext) {
     return value ? "<img src='" + CRM.Setting.extensionURL + "/js/SlickGrid/images/tick.png'>" : "";
   }
-  
+
   function SelectFormatter(row, cell, value, columnDef, dataContext) {
-    return columnDef.options[value];
+    if(columnDef.options[value]) {
+      return columnDef.options[value];
+    }
+    console.log('here');
   }
-  
+
   function CurrencyFormatter(row, cell, value, columnDef, dataContext) {
     //@todo use civicrm currency
     if (value === null || value === "" || !(value > 0)) {
@@ -69,5 +73,9 @@
     } else {
       return "$" + Number(value).toFixed(2);
     }
+  }
+
+  function ContactFormatter(row, cell, value, columnDef, dataContext) {
+    return dataContext[columnDef['field'] + '_name'];
   }
 })(jQuery);

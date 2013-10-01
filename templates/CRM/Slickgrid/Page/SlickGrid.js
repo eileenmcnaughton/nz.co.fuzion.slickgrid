@@ -40,7 +40,62 @@
     enableAddRow: true,
     editable: true
   };
+  /**
+   * Pops up the complete form when you click on edit button
+   * copied from composite editor example - don't yet understand well enough to relocate / comment appropriately
+   */
 
+  function openDetails() {
+      if (grid.getEditorLock().isActive() && !grid.getEditorLock().commitCurrentEdit()) {
+          return;
+      }
+
+      var $modal = $("<div class='item-details-form'></div>");
+
+      $modal = $("#contactIDTemplate")
+          .tmpl({
+              context: grid.getDataItem(grid.getActiveCell().row),
+              columns: columns
+          })
+          .appendTo("body");
+
+      $modal.keydown(function (e) {
+          if (e.which == $.ui.keyCode.ENTER) {
+              grid.getEditController().commitCurrentEdit();
+              e.stopPropagation();
+              e.preventDefault();
+          } else if (e.which == $.ui.keyCode.ESCAPE) {
+              grid.getEditController().cancelCurrentEdit();
+              e.stopPropagation();
+              e.preventDefault();
+          }
+      });
+
+      $modal.find("[data-action=save]").click(function () {
+          grid.getEditController().commitCurrentEdit();
+      });
+
+      $modal.find("[data-action=cancel]").click(function () {
+          grid.getEditController().cancelCurrentEdit();
+      });
+
+
+      var containers = $.map(columns, function (c) {
+          return $modal.find("[data-editorid=" + c.id + "]");
+      });
+
+      var compositeEditor = new Slick.CompositeEditor(
+          columns,
+          containers,
+          {
+              destroy: function () {
+                  $modal.remove();
+              }
+          }
+      );
+
+      grid.editActiveCell(compositeEditor);
+  }
   $('#crm-btn-process').on('click', function(){
     CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id})
   });
@@ -51,7 +106,9 @@
       if(columns[field]['editor'] == 1024) {
         columns[field]['formatter'] = Slick.Formatters.Currency;
       }
-
+      if(columns[field]['editor'] == 5000) {
+        columns[field]['formatter'] = Slick.Formatters.Contact;
+      }
       columns[field]['editor'] = getEditorType(specs['editor']);
       if(columns[field]['editor'] == Slick.Editors.Checkbox) {
         columns[field]['formatter'] = Slick.Formatters.Checkmark;
@@ -75,6 +132,9 @@
         var input = data[args.row][grid.getColumns()[args.cell].field];
         var row = args.row;
         var params = {'id' : row + 1};
+        if(args.item[columnName + '_name']) {
+          params[columnName + '_name'] = args.item[columnName + '_name'];
+        }
         params[columnName] = input;
         params['grid_id'] = CRM.form.grid_id;
         CRM.api('SlickGrid', 'create', params);

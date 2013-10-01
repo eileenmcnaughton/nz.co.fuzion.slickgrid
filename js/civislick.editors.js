@@ -489,7 +489,7 @@
       $wrapper = $("<DIV style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
           .appendTo($container);
 
-      $input = $("<TEXTAREA hidefocus rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
+      $input = $("<TEXTAREA hidefocus rows=5 style='background:white;width:250px;height:80px;border:0;outline:0'>")
           .appendTo($wrapper);
 
       $("<DIV style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
@@ -590,13 +590,13 @@
         }
         option_str = ""
         for( i in opt_values ){
-          v = opt_values[i];
-          option_str += "<OPTION value='"+i+"'>"+v+"</OPTION>";
+            v = opt_values[i];
+            option_str += "<OPTION value='"+i+"'>"+v+"</OPTION>";
         }
         $select = $("<SELECT tabIndex='0' class='editor-select'>"+ option_str +"</SELECT>");
         $select.appendTo(args.container);
         $select.focus();
-    };
+  };
 
     this.destroy = function() {
         $select.remove();
@@ -607,7 +607,7 @@
     };
 
     this.loadValue = function(item) {
-        defaultValue = item[args.column.field];
+      defaultValue = item[args.column.field];
         $select.val(defaultValue);
     };
 
@@ -643,121 +643,99 @@
      * KeyDown events are also handled to provide handling for Tab, Shift-Tab, Esc and Ctrl-Enter.
      */
     function SelectContactEditor(args) {
-        var $input, $wrapper;
+        var $input;
         var defaultValue;
         var scope = this;
+        var container = $("body");
 
-        this.init = function () {
-            var $container = $("body");
-            var gid = 1;
-            $('<div></div>').attr("id", 'dialogId');
-            var dataURL = CRM.url('civicrm/profile/create', 'reset=1&snippet=5&context=dialog&prefix=&gid=' + gid);
-            $.ajax({
-                url: dataURL,
-                success: function( content ) {
-                  $('#dialogId').show( ).html( content ).dialog({
-                        title: ts("Create New Contact"),
-                        modal: true,
-                        width: 680,
-                        appendTo: $container,
-                        overlay: {
-                           opacity: 0.5,
-                           background: "black"
-                        },
+        this.init = function() {
 
-                        close: function(event, ui) {
-                            alert('toodledoo');
-                        }
-                    });
-                }
-            });
-            $wrapper = $("<DIV style='z-index:10000;position:absolute;background:white;padding:5px;border:3px solid gray; -moz-border-radius:10px; border-radius:10px;'/>")
-                ;
+          $wrapper = $("<div class='contact-box'/>")
+            .appendTo(container);
 
-            $input = $("<TEXTAREA hidefocus rows=5 style='backround:white;width:250px;height:80px;border:0;outline:0'>")
+          $input = $("<input rows=1.5 id='editor-autocomplete' class='editor-autocomplete'/>")
+              .appendTo($wrapper);
+       /*   $("<DIV style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
+                .appendTo($wrapper);
+         */
+
+          $(" OR <select id='new_contact'> <option value=''>- create new contact -</option>"
+              + "<option value='new_individual'>New Individual</option>"
+              + "<option value='new_organization'>New Organization</option>"
+              + "<option value='new_household'>New Household</option></select>" +
+              "</div>" +
+              "<div id='new_profile'></div>" +
+              "<div id='addresses'></div>" +
+              "<div style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
                 .appendTo($wrapper);
 
-            $("<DIV style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
-                .appendTo($wrapper);
 
-            $wrapper.find("button:first").bind("click", this.save);
-            $wrapper.find("button:last").bind("click", this.cancel);
-            $input.bind("keydown", this.handleKeyDown);
+          assignAutoComplete('#editor-autocomplete', '.active');
 
-            scope.position(args.position);
-            $input.focus().select();
+          $wrapper.find("button:first").bind("click", this.save);
+          $wrapper.find("button:last").bind("click", this.cancel);
+          scope.position(args.position);
+          $input.focus().select();
+          if(args.item[args.column.field]) {
+            buildContactForm($input, args.item[args.column.field]);
+          }
+          $('#new_contact').on('change', buildContactForm($('#editor-autocomplete')));
         };
 
-        this.handleKeyDown = function (e) {
-            if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
-                scope.save();
-            } else if (e.which == $.ui.keyCode.ESCAPE) {
-                e.preventDefault();
-                scope.cancel();
-            } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
-                e.preventDefault();
-                args.grid.navigatePrev();
-            } else if (e.which == $.ui.keyCode.TAB) {
-                e.preventDefault();
-                args.grid.navigateNext();
-            }
+
+        this.destroy = function() {
+            $wrapper.remove();
         };
 
+        this.focus = function() {
+          console.log($select);
+          console.log(args);
+            $input.focus();
+
+        };
+
+        this.loadValue = function(item) {
+          $input.val(defaultValue = item[args.column.field + '_name']);
+          $input.select();
+        };
+
+        this.serializeValue = function() {
+          return $input.val();
+        };
+
+        this.applyValue = function(item, state) {
+          console.log(item);
+          console.log(state);
+          console.log(args);
+          //here we save it to 2 fields
+          parts = state.split('~~');
+          item[args.column.field] = parts[0];
+          item[args.column.field + '_name'] = parts[1];
+        };
+
+        this.isValueChanged = function() {
+            return ($input.val() != defaultValue);
+        };
+
+        this.validate = function() {
+            return {
+                valid: true,
+                msg: null
+            };
+        };
         this.save = function () {
-            args.commitChanges();
+          args.commitChanges();
         };
 
         this.cancel = function () {
             $input.val(defaultValue);
             args.cancelChanges();
         };
-
-        this.hide = function () {
-            $wrapper.hide();
-        };
-
-        this.show = function () {
-            $wrapper.show();
-        };
-
         this.position = function (position) {
             $wrapper
-                .css("top", position.top - 5)
-                .css("left", position.left - 5)
+              .css("top", position.top - 5)
+              .css("left", position.left - 5)
         };
-
-        this.destroy = function () {
-            $wrapper.remove();
-        };
-
-        this.focus = function () {
-            $input.focus();
-        };
-
-        this.loadValue = function (item) {
-            $input.val(defaultValue = item[args.column.field]);
-            $input.select();
-        };
-
-        this.serializeValue = function () {
-            return $input.val();
-        };
-
-        this.applyValue = function (item, state) {
-            item[args.column.field] = state;
-        };
-
-        this.isValueChanged = function () {
-            return (!($input.val() == "" && defaultValue == null)) && ($input.val() != defaultValue);
-        };
-
-        this.validate = function () {
-            return {
-                valid: true,
-                msg: null
-            };
-        };
-
         this.init();
     }
 
