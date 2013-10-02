@@ -200,4 +200,46 @@ cj(function ($) {
     dataView.setItems(CRM.Form.Data);
     dataView.endUpdate();
   })
+  function TotalsDataProvider(data, columns) {
+    var totals = {};
+    var totalsMetadata = {
+      // Style the totals row differently.
+      cssClasses: "totals",
+      columns: {}
+    };
+
+    // Make the totals not editable.
+    for (var i = 0; i < columns.length; i++) {
+      totalsMetadata.columns[i] = { editor: null };
+    }
+
+
+    this.getLength = function() {
+      return data.length + 1;
+    };
+
+    this.getItem = function(index) {
+      return (index < data.length) ? data[index] : totals;
+    };
+
+    this.updateTotals = function() {
+      var columnIdx = columns.length;
+      while (columnIdx--) {
+        var columnId = columns[columnIdx].id;
+        var total = 0;
+        var i = data.length;
+        while (i--) {
+          total += (parseInt(data[i][columnId], 10) || 0);
+        }
+        totals[columnId] = "Sum:  " + total;
+      }
+    };
+
+    this.getItemMetadata = function(index) {
+      return (index != data.length) ? null : totalsMetadata;
+    };
+
+    this.updateTotals();
+  }
+
 
