@@ -150,7 +150,8 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       $fields[$profileField]['name_field'] = $profileField . '_name';
     }
     if(CRM_Utils_Array::value('data_type',$specs) ==  'ContactReference') {
-      $fields[$profileField]['type'] = 5000;
+      $fields[$profileField]['type'] = 5001;
+      $fields[$profileField]['url'] = CRM_Utils_System::url('civicrm/ajax/contactref', 'context=customfield&id=' . CRM_Core_BAO_CustomField::getKeyID($profileField));
     }
 
    }

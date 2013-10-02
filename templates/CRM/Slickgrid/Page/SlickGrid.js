@@ -22,7 +22,8 @@ cj(function ($) {
       12 : Slick.Editors.Date,
       16 : Slick.Editors.Checkbox,
       1024 : Slick.Editors.Float,
-      5000 : Slick.Editors.SelectContact
+      5000 : Slick.Editors.SelectContact,
+      5001 : Slick.Editors.SelectContactSimple // without create new
     };
 
     if(types[type]) {

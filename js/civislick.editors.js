@@ -18,7 +18,8 @@
         "PercentComplete": PercentCompleteEditor,
         "LongText": LongTextEditor,
         "SelectOption": SelectCellEditor,
-        "SelectContact": SelectContactEditor
+        "SelectContact": SelectContactEditor,
+        "SelectContactSimple": SelectContactEditorSimple
       }
     }
   });
@@ -816,5 +817,115 @@
 
         this.init();
     }
+    function SelectContactEditorSimple(args) {
+      var $input;
+      var defaultValue;
+      var scope = this;
+      var container = $("body");
 
+      this.init = function() {
+
+        $wrapper = $("<div class='contact-box'/>")
+          .appendTo(container);
+
+        $input = $("<input rows=1.5 id='editor-autocomplete' class='editor-autocomplete'/>")
+            .appendTo($wrapper);
+        assignAutoComplete('#editor-autocomplete', '.active');
+        $wrapper.find("button:first").bind("click", this.save);
+        $wrapper.find("button:last").bind("click", this.cancel);
+        $input.bind("keydown", this.handleKeyDown);
+        scope.position(args.position);
+        $input.focus().select();
+      };
+
+
+      this.destroy = function() {
+          $wrapper.remove();
+      };
+
+      this.focus = function() {
+        console.log($select);
+        console.log(args);
+          $input.focus();
+
+      };
+
+      this.loadValue = function(item) {
+        $input.val(defaultValue = item[args.column.field + '_name']);
+        $input.select();
+      };
+
+      this.serializeValue = function() {
+        return $input.val();
+      };
+
+      this.applyValue = function(item, state) {
+        if(!$input.attr('entity_id')){
+          item[args.column.field] = null;
+          item[args.column.field + '_name'] = '';
+        }
+        item[args.column.field] = $input.attr('entity_id');
+        item[args.column.field + '_name'] = state;
+      };
+
+      this.isValueChanged = function() {
+          return ($input.val() != defaultValue);
+      };
+
+      this.validate = function() {
+          return {
+              valid: true,
+              msg: null
+          };
+      };
+
+      this.save = function (event) {
+        args.commitChanges();
+      };
+
+      this.cancel = function () {
+          $input.val(defaultValue);
+          args.cancelChanges();
+      };
+      this.position = function (position) {
+          $wrapper
+            .css("top", position.top - 5)
+            .css("left", position.left - 5)
+      };
+
+      this.handleKeyDown = function (e) {
+        if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
+          scope.save();
+        } else if (e.which == $.ui.keyCode.ESCAPE) {
+          e.preventDefault();
+          scope.cancel();
+        } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
+          e.preventDefault();
+          args.grid.navigatePrev();
+        } else if (e.which == $.ui.keyCode.TAB) {
+          e.preventDefault();
+          args.grid.navigateNext();
+        }
+        else if (e.which == 13) {
+          e.preventDefault();
+          if (options.editable) {
+            if (currentEditor) {
+              // adding new row
+              if (activeRow === getDataLength()) {
+                navigateRight();
+              } else {
+                commitEditAndSetFocus();
+              }
+            } else {
+            if (getEditorLock().commitCurrentEdit()) {
+              makeActiveCellEditable();
+            }
+          }
+        }
+        handled = true;
+      }
+      };
+
+      this.init();
+  }
 })(jQuery);
