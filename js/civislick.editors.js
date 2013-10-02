@@ -825,12 +825,13 @@
 
       this.init = function() {
 
-        $wrapper = $("<div class='contact-box'/>")
-          .appendTo(container);
+      $wrapper = $("<div class='contact-box'/>")
+        .appendTo(container);
 
         $input = $("<input rows=1.5 id='editor-autocomplete' class='editor-autocomplete'/>")
             .appendTo($wrapper);
-        assignAutoComplete('#editor-autocomplete', '.active');
+        var url = CRM.url('civicrm/ajax/contactref', 'context=customfield&id=' + args.column.field.replace('custom_', ''));
+        assignAutoComplete('#editor-autocomplete', '.active', url);
         $wrapper.find("button:first").bind("click", this.save);
         $wrapper.find("button:last").bind("click", this.cancel);
         $input.bind("keydown", this.handleKeyDown);
@@ -844,9 +845,7 @@
       };
 
       this.focus = function() {
-        console.log($select);
-        console.log(args);
-          $input.focus();
+        $input.focus();
 
       };
 
@@ -906,24 +905,6 @@
           e.preventDefault();
           args.grid.navigateNext();
         }
-        else if (e.which == 13) {
-          e.preventDefault();
-          if (options.editable) {
-            if (currentEditor) {
-              // adding new row
-              if (activeRow === getDataLength()) {
-                navigateRight();
-              } else {
-                commitEditAndSetFocus();
-              }
-            } else {
-            if (getEditorLock().commitCurrentEdit()) {
-              makeActiveCellEditable();
-            }
-          }
-        }
-        handled = true;
-      }
       };
 
       this.init();

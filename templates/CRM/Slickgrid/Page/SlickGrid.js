@@ -114,6 +114,9 @@ cj(function ($) {
       if(columns[field]['editor'] == 5000) {
         columns[field]['formatter'] = Slick.Formatters.Contact;
       }
+      if(columns[field]['editor'] == 5001) {
+        columns[field]['formatter'] = Slick.Formatters.Contact;
+      }
       columns[field]['editor'] = getEditorType(specs['editor']);
       if(columns[field]['editor'] == Slick.Editors.Checkbox) {
         columns[field]['formatter'] = Slick.Formatters.Checkmark;
