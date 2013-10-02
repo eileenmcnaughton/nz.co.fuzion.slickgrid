@@ -664,8 +664,8 @@
               + "<option value='new_organization'>New Organization</option>"
               + "<option value='new_household'>New Household</option></select>" +
               "</div>" +
-              "<div id='new_profile'></div>" +
-              "<div id='addresses'></div>" +
+              "<div id='new_profile' class='api_call' data-entity='profile'></div>" +
+              "<div id='addresses' data-entity='address'></div>" +
               "<div style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
                 .appendTo($wrapper);
 
@@ -674,13 +674,14 @@
 
           $wrapper.find("button:first").bind("click", this.save);
           $wrapper.find("button:last").bind("click", this.cancel);
+          $input.bind("keydown", this.handleKeyDown);
           scope.position(args.position);
           $input.focus().select();
           if(args.item[args.column.field]) {
             buildContactForm($input, args.item[args.column.field]);
           }
           $('#new_contact').on('change', function(){
-            buildContactForm($('#editor-autocomplete'));
+            rebuildContactForm($('#editor-autocomplete'));
           });
         };
 
@@ -706,6 +707,10 @@
         };
 
         this.applyValue = function(item, state) {
+          if(!$input.attr('entity_id')){
+            item[args.column.field] = null;
+            item[args.column.field + '_name'] = '';
+          }
           item[args.column.field] = $input.attr('entity_id');
           item[args.column.field + '_name'] = state;
         };
@@ -720,10 +725,50 @@
                 msg: null
             };
         };
-        this.save = function () {
-          console.log($(this));
-          console.log($wrapper);
-          args.commitChanges();
+
+        this.save = function (event) {
+          var inputs = $('#new_profile input');
+          var profileDiv = $('#new_profile');
+          var profileID = $(profileDiv).val();
+          var params  = profileDiv.data('api_params');
+          $.each(inputs, function ( index, value){
+            params[$(value).data('field')] = $(value).val();
+          });
+          var contactID = $input.attr('entity_id');
+          if(contactID) {
+            params['contact_id'] = contactID;
+          }
+          else {
+            params['contact_type'] = params['profile_id'].replace('new_', '');
+          }
+          CRM.api('contact', 'create',  params, {
+            success: function(result) {
+              contactID = result.id;
+              displayName = result['values'][contactID]['display_name'];
+              args.item[args.column.field] = contactID;
+              args.item[args.column.field + '_name'] = displayName;
+              $input.attr('entity_id', result.id);
+
+              // see https://groups.google.com/forum/#!searchin/slickgrid/navigation/slickgrid/WfW6V7n6Gyo/4ZTKapZFR6QJ
+              // for why I set autoEdit on & off
+              // (to prevent the navigation going down) & hopefully some response
+              // it prevents it going down bug ...
+              //args.grid.setOptions({autoEdit:false});
+            //perhaps here we bind a listener
+              // @todo not cool this - but for now...
+              var gridParams = {};
+              gridParams['grid_id'] = CRM.form.grid_id;
+              gridParams[args.column.field] = contactID;
+              gridParams[args.column.field + '_name'] = displayName;
+              CRM.api('SlickGrid', 'create', gridParams);
+             // args.commitChanges();
+              //args.grid.setOptions({autoEdit:true});
+              //args.grid.navigateUp();
+              args.grid.navigateNext();
+            },
+            error: function(result) {
+            }
+          });
         };
 
         this.cancel = function () {
@@ -735,6 +780,40 @@
               .css("top", position.top - 5)
               .css("left", position.left - 5)
         };
+
+        this.handleKeyDown = function (e) {
+          if (e.which == $.ui.keyCode.ENTER && e.ctrlKey) {
+            scope.save();
+          } else if (e.which == $.ui.keyCode.ESCAPE) {
+            e.preventDefault();
+            scope.cancel();
+          } else if (e.which == $.ui.keyCode.TAB && e.shiftKey) {
+            e.preventDefault();
+            args.grid.navigatePrev();
+          } else if (e.which == $.ui.keyCode.TAB) {
+            e.preventDefault();
+            args.grid.navigateNext();
+          }
+          else if (e.which == 13) {
+            e.preventDefault();
+            if (options.editable) {
+              if (currentEditor) {
+                // adding new row
+                if (activeRow === getDataLength()) {
+                  navigateRight();
+                } else {
+                  commitEditAndSetFocus();
+                }
+              } else {
+              if (getEditorLock().commitCurrentEdit()) {
+                makeActiveCellEditable();
+              }
+            }
+          }
+          handled = true;
+        }
+        };
+
         this.init();
     }
 

@@ -33,6 +33,12 @@ function assignAutoComplete(select_field, id_field, url, varmax, profileids) {
     }
 }
 
+function rebuildContactForm(editor) {
+  $(editor).val('');
+  editor.attr('entity_id', '');
+  buildContactForm(editor);
+}
+
 function buildContactForm(customObj, contactID) {
   var profileFieldValue;
   var profileDiv = $('#new_profile');
@@ -44,21 +50,23 @@ function buildContactForm(customObj, contactID) {
   if(!profileID) {
     profileID = 'new_individual'
   }
+  profileDiv.data('api_params', {'profile_id': profileID, 'contact_id' : contactID});
   var primaryFieldName; //we track the possible alternate name of the email field because we are struggling with
   CRM.api('profile', 'get', {
     'profile_id' : profileID,
     'contact_id' : contactID,
     }, {
       success: function(result) {
-
           cj.each(result.values, function (id, value){
             var profilehtml = '<div class="crm-entity" data-entity="contact" data-id=' + contactID + '><table>';
               cj.each(CRM.Profile[profileID], function (fieldname, fieldvalue) {
-                primaryFieldName = fieldname + '-primary';
                 if(!fieldvalue.name || -1 == ($.inArray(fieldvalue.entity, ['address', 'email', 'phone', 'contact']))) {
                   return;
                 }
 
+                //funky handling to try to deal with primary field - never quite sure when it will be
+                //email vs 'email-primary
+                primaryFieldName = fieldname.replace('-primary', '') + '-primary';
                 if(value[fieldvalue.name]) {
                   profileFieldValue = value[fieldvalue.name];
                 }
@@ -75,9 +83,8 @@ function buildContactForm(customObj, contactID) {
                 else {
                   profilehtml += "<div><tr><td>" +  fieldvalue.title
                   profilehtml += "</td><td></td><td>"
-                  profilehtml += '<span data-field="' + fieldvalue.name + '" data-action="create" class =  "crm-editable">'
-                  profilehtml += profileFieldValue
-                  profilehtml += '</span></td><td></td></tr></div>';
+                  profilehtml += '<input type="text" value="' + profileFieldValue + '" data-field="' + fieldvalue.name + '" data-action="create">'
+                  profilehtml += '</td><td></td></tr></div>';
                 }
 
              });
@@ -98,17 +105,16 @@ function buildContactForm(customObj, contactID) {
           CRM.api('address', 'match', value, {success: function(result) {
             $('#shared_address').html(result.count + " contacts have the same address");
           }});
-          var addresshtml = '<div class="crm-entity" data-entity="address" data-id=' + contactID + '><table>';
+          var addresshtml = '<div class="crm-entity" data-location-type-id = "' + result['location_type_id']
+            + '"data-entity="address" data-id=' + contactID + '><table>';
             cj.each(value, function (fieldname, fieldvalue) {
-              addresshtml += "<div><tr><td>" +  fieldname
+              addresshtml += "<tr><td>" +  fieldname
               addresshtml += "</td><td>"
-              addresshtml += '<span data-field="' + fieldvalue + '" data-action="create" class =  "crm-editable">'
-              addresshtml += '</span></td></tr></div>';
+              addresshtml += '<input type="text" data-field="' + fieldvalue + '" data-action="create"/>'
+              addresshtml += '</td></tr>';
 
            });
            addresshtml += '</table></div>';
-       //    var combo = customObj.after(addresshtml);
-           cj('.crm-editable').crmEditable ();
            $modal = $("#addressTemplate")
            .tmpl(value)
            .insertAfter(profileDiv);
@@ -164,3 +170,4 @@ function geolocate() {
      }
    });
 }
+
