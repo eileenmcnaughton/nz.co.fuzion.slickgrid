@@ -706,13 +706,8 @@
         };
 
         this.applyValue = function(item, state) {
-          console.log(item);
-          console.log(state);
-          console.log(args);
-          //here we save it to 2 fields
-          parts = state.split('~~');
-          item[args.column.field] = parts[0];
-          item[args.column.field + '_name'] = parts[1];
+          item[args.column.field] = $input.attr('entity_id');
+          item[args.column.field + '_name'] = state;
         };
 
         this.isValueChanged = function() {
@@ -726,6 +721,8 @@
             };
         };
         this.save = function () {
+          console.log($(this));
+          console.log($wrapper);
           args.commitChanges();
         };
 

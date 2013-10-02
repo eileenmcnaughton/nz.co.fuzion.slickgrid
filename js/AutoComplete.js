@@ -21,7 +21,7 @@ function assignAutoComplete(select_field, id_field, url, varmax, profileids) {
                 var contactID = data[1];
                 var displayName = data[0];
                 //having trouble doing an
-                customObj.val(contactID + '~~' + displayName);
+                customObj.val(displayName);
                 customObj.attr('entity_id', contactID);
                 customObj.attr('display_name', displayName);
                 buildContactForm(customObj, contactID);
