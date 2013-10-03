@@ -7,7 +7,7 @@ function civicrm_api3_slick_grid_create($params) {
   $ignoredKeys = array('id', 'grid_id', 'check_permissions', 'version', 'IDS_request_uri', 'IDS_user_agent');
   $fields = array_diff_key($params, array_fill_keys($ignoredKeys, 1));
   //@todo get rid of all this crap & sort out the escaping
-  $exists = CRM_Core_DAO::singleValueQuery(" SELECT count(*) FROM $tempTable WHERE grid_id = " . $params['id']);
+  $exists = CRM_Core_DAO::singleValueQuery(" SELECT count(*) FROM $tempTable WHERE grid_id = " . $id);
   $dataExists  = false;
   $updatesql = array();
   foreach ($fields as $field => $value) {
@@ -23,8 +23,9 @@ function civicrm_api3_slick_grid_create($params) {
   if(!dataExists) {
     return civicrm_api3_create_success(array($params['id'] => array('id' => $params['id'] )));
   }
-    $sql = " INSERT INTO $tempTable (grid_id, ". str_replace('-', '__', implode(',', array_keys($fields))) . ') '
-     . 'values(' . $params['id'] . ", '" . implode("','", $fields) . "')";
+    $sql = " INSERT INTO $tempTable ("
+      . str_replace('-', '__', implode(',', array_keys($fields))) . ') '
+      . "values('" . implode("','", $fields) . "')";
   }
   CRM_Core_DAO::executeQuery($sql);
 

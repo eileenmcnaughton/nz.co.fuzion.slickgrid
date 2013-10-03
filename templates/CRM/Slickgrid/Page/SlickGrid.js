@@ -158,7 +158,8 @@ cj(function ($) {
       var item = args.item;//CRM.api('SlickGrid', 'create', params);
       var numberOfRows = grid.getDataLength();
       var params = args.item;
-      params['id'] = numberOfRows + 1;
+      console.log(item);
+      //fix me - once we start deleting rows need the max id
       params['grid_id'] = CRM.form.grid_id;
       CRM.api('SlickGrid', 'create', params);
       var row = dataView.getItem(args.row);

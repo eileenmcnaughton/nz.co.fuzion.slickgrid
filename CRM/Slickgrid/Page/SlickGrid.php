@@ -94,6 +94,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       $columns[] = $column;
       if(empty($savedRowCount)) {
         $data[$savedRowCount][$field] = CRM_Utils_Array::value('default_value', $spec, '');
+        $data[$savedRowCount]['id'] = 1;
       }
       $totalWidth += $width;
     }
@@ -126,7 +127,6 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       ),
       'Profile' => $newProfileFields,
     ));
-
     parent::run();
   }
 

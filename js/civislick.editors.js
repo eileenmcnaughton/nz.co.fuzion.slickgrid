@@ -656,9 +656,6 @@
 
           $input = $("<input rows=1.5 id='editor-autocomplete' class='editor-autocomplete'/>")
               .appendTo($wrapper);
-       /*   $("<DIV style='text-align:right'><BUTTON>Save</BUTTON><BUTTON>Cancel</BUTTON></DIV>")
-                .appendTo($wrapper);
-         */
 
           $(" OR <select id='new_contact'> <option value=''>- create new contact -</option>"
               + "<option value='new_individual'>New Individual</option>"
@@ -757,11 +754,6 @@
               //args.grid.setOptions({autoEdit:false});
             //perhaps here we bind a listener
               // @todo not cool this - but for now...
-              var gridParams = {};
-              gridParams['grid_id'] = CRM.form.grid_id;
-              gridParams[args.column.field] = contactID;
-              gridParams[args.column.field + '_name'] = displayName;
-              CRM.api('SlickGrid', 'create', gridParams);
              // args.commitChanges();
               //args.grid.setOptions({autoEdit:true});
               //args.grid.navigateUp();
