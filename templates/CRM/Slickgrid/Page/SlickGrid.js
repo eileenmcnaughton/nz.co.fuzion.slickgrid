@@ -8,10 +8,6 @@ cj(function ($) {
     }
   }
 
-  function formatter(row, cell, value, columnDef, dataContext) {
-    return value;
-  }
-
   /**
    * Translate CiviCRM field type to slickgrid editor type
    * @param string $type
@@ -41,12 +37,15 @@ cj(function ($) {
     enableCellNavigation: true,
     enableColumnReorder: true,
     enableAddRow: true,
-    editable: true
+    editable: true,
+    showTotalsHeader : true, // doesn't seem to work
+    showTotalsFooter : true,
+    autoHeight: true, // allows vertical scrolling
+    headerRowHeight : 45 // doesn't see to work - have also set by css which does
   };
   /**
    * Pops up the complete form when you click on edit button
    * copied from composite editor example - don't yet understand well enough to relocate / comment appropriately
-   */
 
   function openDetails() {
       if (grid.getEditorLock().isActive() && !grid.getEditorLock().commitCurrentEdit()) {
@@ -99,6 +98,7 @@ cj(function ($) {
 
       grid.editActiveCell(compositeEditor);
   }
+  */
   $('#crm-btn-process').on('click', function(){
     CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id}), function(result) {
 
@@ -178,7 +178,7 @@ cj(function ($) {
       grid.render();
     });
 
-    // When user clicks button, fetch data via Ajax, and bind it to the dataview.
+    /* When user clicks button, fetch data via Ajax, and bind it to the dataview.
     $('#mybutton').click(function() {
         CRM.api('slick_grid','get', {'grid_id' : 26}, function(data) {
         dataView.beginUpdate();console,log(data);
@@ -186,6 +186,7 @@ cj(function ($) {
         dataView.endUpdate();
       });
     });
+    */
 
     grid.onSort.subscribe(function (e, args) {
       console.log(args);
