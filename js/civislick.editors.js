@@ -672,7 +672,7 @@
 
           $wrapper.find("button:first").bind("click", this.save);
           $wrapper.find("button:last").bind("click", this.cancel);
-          $input.bind("keydown", this.handleKeyDown);
+       //   $input.bind("keydown", this.handleKeyDown);
           scope.position(args.position);
           $input.focus().select();
           if(args.item[args.column.field]) {
@@ -701,6 +701,7 @@
         };
 
         this.serializeValue = function() {
+          console.log($input);
           return $input.val();
         };
 
@@ -714,6 +715,8 @@
         };
 
         this.isValueChanged = function() {
+          console.log($input.val());
+          console.log(defaultValue);
             return ($input.val() != defaultValue);
         };
 
@@ -741,23 +744,12 @@
           }
           CRM.api('contact', 'create',  params, {
             success: function(result) {
+              $input.attr('entity_id', result.id);
               contactID = result.id;
               displayName = result['values'][contactID]['display_name'];
-              args.item[args.column.field] = contactID;
-              args.item[args.column.field + '_name'] = displayName;
-              $input.attr('entity_id', result.id);
-
-              // see https://groups.google.com/forum/#!searchin/slickgrid/navigation/slickgrid/WfW6V7n6Gyo/4ZTKapZFR6QJ
-              // for why I set autoEdit on & off
-              // (to prevent the navigation going down) & hopefully some response
-              // it prevents it going down bug ...
-              //args.grid.setOptions({autoEdit:false});
-            //perhaps here we bind a listener
-              // @todo not cool this - but for now...
-             // args.commitChanges();
-              //args.grid.setOptions({autoEdit:true});
-              //args.grid.navigateUp();
-              args.grid.navigateNext();
+            //  args.item[args.column.field] = contactID;
+            //  args.item[args.column.field + '_name'] = displayName;
+              args.commitChanges();
             },
             error: function(result) {
             }

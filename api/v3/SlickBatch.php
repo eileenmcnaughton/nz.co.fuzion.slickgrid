@@ -31,8 +31,9 @@ function civicrm_api3_slick_batch_create($params) {
   $fieldStatement = implode(' , ', $fieldStatements);
   //do we rename id ? needs to be unique but current implementation (hackery) is no autoincrement
   $table = 'civicrm_slickgrid_' . $params['profile_id'] . date('Y_m_d') . rand(0,100);
-  $sql = "CREATE TABLE $table ( grid_id INT(10) UNSIGNED NOT NULL,
-    $fieldStatement
+  $sql = "CREATE TABLE $table ( grid_id INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+    $fieldStatement,
+    PRIMARY KEY (grid_id)
   )";
   try{
     CRM_Core_DAO::executeQuery($sql);

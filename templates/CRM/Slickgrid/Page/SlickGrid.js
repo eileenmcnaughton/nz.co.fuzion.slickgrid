@@ -100,9 +100,19 @@ cj(function ($) {
   }
   */
   $('#crm-btn-process').on('click', function(){
-    CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id}), function(result) {
-
-    }
+    $('#crm-btn-process').prop("disabled", true).text('processing');
+    CRM.api('slick_batch', 'submit', {'id': CRM.form.grid_id}, {
+      success : function (result) {
+        console.log(result);
+        CRM.alert('Your batch submitted successfully');
+        window.location.replace(CRM.url("civicrm/civislick"));
+      },
+      error : function (result) {
+        console.log(result);
+        CRM.alert('Failed to validate - not submitted');
+        $('#crm-btn-process').prop("disabled", false).text('re-submit');
+      }
+    });
   });
  // $(function () {
 
@@ -137,7 +147,9 @@ cj(function ($) {
     //this line probably applies only if we switch to RowSelectionModel
     // which I tried because of the sync fn per below but not working
     //https://github.com/mleibman/SlickGrid/wiki/DataView
-    grid.onSelectedRowsChanged.subscribe(function() { console.log(grid.getSelectedRows()); });
+    grid.onSelectedRowsChanged.subscribe(function() {
+      console.log(grid.getSelectedRows()); }
+    );
 
     grid.onCellChange.subscribe(function (e, args) {
       var cell = grid.getCellFromEvent(e);
@@ -155,15 +167,18 @@ cj(function ($) {
     });
 
     grid.onAddNewRow.subscribe(function (e, args) {
-      var item = args.item;//CRM.api('SlickGrid', 'create', params);
-      var numberOfRows = grid.getDataLength();
-      var params = args.item;
+      var item = args.item;
+      item["id"] = dataView.getLength() + 1;
       console.log(item);
+      var params = item;
       //fix me - once we start deleting rows need the max id
       params['grid_id'] = CRM.form.grid_id;
-      CRM.api('SlickGrid', 'create', params);
-      var row = dataView.getItem(args.row);
-      dataView.addItem(item);
+      //probably this should be a function of the dataview not the grid
+      CRM.api('SlickGrid', 'create', item);
+      data.push(item);
+      dataView.beginUpdate();
+      dataView.setItems(data);
+      dataView.endUpdate();
     });
 
 
@@ -177,6 +192,8 @@ cj(function ($) {
       grid.invalidateRows(args.rows);
       grid.render();
     });
+    //code for deleting rows
+  //http://stackoverflow.com/questions/9126772/slickgrid-cannot-delete-added-rows-but-only-existing-ones-what-am-i-doing-wron
 
     /* When user clicks button, fetch data via Ajax, and bind it to the dataview.
     $('#mybutton').click(function() {

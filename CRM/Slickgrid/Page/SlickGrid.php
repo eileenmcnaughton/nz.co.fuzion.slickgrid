@@ -85,6 +85,9 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
         'width' => $width,
         'sortable' => TRUE,
       );
+      if($spec['type'] == 1024) {
+       $column['showTotalsHeader'] = TRUE;
+      }
       if(isset($spec['options'])) {
         $column['options'] = $spec['options'];
       }
