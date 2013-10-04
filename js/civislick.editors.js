@@ -710,6 +710,7 @@
             item[args.column.field] = null;
             item[args.column.field + '_name'] = '';
           }
+          //@todo this is wrong - should get from serialize & not refer to dom obj here
           item[args.column.field] = $input.attr('entity_id');
           item[args.column.field + '_name'] = state;
         };
@@ -748,7 +749,7 @@
               contactID = result.id;
               displayName = result['values'][contactID]['display_name'];
             //  args.item[args.column.field] = contactID;
-            //  args.item[args.column.field + '_name'] = displayName;
+              args.item[args.column.field + '_name'] = displayName;
               args.commitChanges();
             },
             error: function(result) {
