@@ -154,11 +154,11 @@ cj(function ($) {
     grid.onSelectedRowsChanged.subscribe(function(e, args) {
       var rowID = grid.getSelectedRows();
       var columns = grid.getColumns();
+      var item = dataView.getItem(rowID);
       var cellCSS = [];
       $.each(columns, function(columnID, specs){
         if(specs.required) {
-          var cell = grid.getCellNode(rowID, columnID);
-          if($(cell).text()) {
+          if(item[specs.id]) {
           }
           else {
             cellCSS[specs.id] = 'invalid';
@@ -166,8 +166,11 @@ cj(function ($) {
         }
       });
       var rowCSS = {};
-      rowCSS[rowID] = cellCSS;
-      grid.setCellCssStyles("invalid", rowCSS);
+      if(cellCSS) {
+        rowCSS[rowID] = cellCSS;
+        grid.setCellCssStyles("invalid", rowCSS);
+        args.row.cssClasses('invalid');
+      }
     });
 
     grid.onCellChange.subscribe(function (e, args) {
