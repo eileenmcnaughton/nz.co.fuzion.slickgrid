@@ -739,6 +739,8 @@
           var contactID = $input.attr('entity_id');
           if(contactID) {
             params['contact_id'] = contactID;
+            args.commitChanges();
+            return;
           }
           else {
             params['contact_type'] = params['profile_id'].replace('new_', '');
@@ -755,6 +757,8 @@
             error: function(result) {
             }
           });
+          // to get where we are to reposition
+          grid.getActiveCellPosition();
         };
 
         this.cancel = function () {

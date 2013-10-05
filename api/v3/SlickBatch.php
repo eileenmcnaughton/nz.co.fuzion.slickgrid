@@ -68,7 +68,7 @@ function civicrm_api3_slick_batch_submit($params) {
   //@todo - preliminary code - needs re-writing with BAO
   $batch = civicrm_api3('slick_batch', 'getsingle', array('id' => $params['id']));
   $grid = civicrm_api3('slick_grid', 'get', array('grid_id' => $params['id']));
-  $params = array('id' => $batch['profile_id']);
+  $params = array('id' => $batch['profile_id'], 'sequential' => 1);
   foreach ($grid['values'] as &$gridEntry) {
     unset($gridEntry['id']);
     $gridEntry['profile_id'] = $batch['profile_id'];
@@ -76,6 +76,8 @@ function civicrm_api3_slick_batch_submit($params) {
   }
   //actually should be null parent :-)
   $result = (civicrm_api3('uf_group', 'get', $params));
+  $profileResult = $result['values'][$batch['profile_id']]['api.profile.submit'][0]['values'];
+  print_r($profileResult );
   return civicrm_api3_create_success($result, $params);
 }
 

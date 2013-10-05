@@ -94,6 +94,9 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
       if(isset($spec['rule'])) {
         $column['rule'] = $spec['rule'];
       }
+      if(!empty($spec['api.required'])) {
+        $column['required'] = TRUE;
+      }
       $columns[] = $column;
       if(empty($savedRowCount)) {
         $data[$savedRowCount][$field] = CRM_Utils_Array::value('default_value', $spec, '');
@@ -160,10 +163,12 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
    }
    if($addContactID) {
      $fields = array_merge(array(
-       'contact_id' => array('title' => 'Contact', 'type' => 5000,
+       'contact_id' => array(
+         'title' => 'Contact', 'type' => 5000,
          'size' => 60,
          'entity' => 'contact',
          'name_field' => 'contact_id_name',
+         'required' => true,
        ),
       // 'contact_id_name' => array('title' => 'Contact', 'type' => 5000)
      ), $fields);

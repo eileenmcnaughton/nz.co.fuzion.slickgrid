@@ -41,7 +41,8 @@ cj(function ($) {
     showTotalsHeader : true, // doesn't seem to work
     showTotalsFooter : true,
     autoHeight: true, // allows vertical scrolling
-    headerRowHeight : 45 // doesn't see to work - have also set by css which does
+    headerRowHeight : 45, // doesn't see to work - have also set by css which does
+    cellHighlightCssClass: "invalid",
   };
   /**
    * Pops up the complete form when you click on edit button
@@ -118,6 +119,9 @@ cj(function ($) {
 
     var data = CRM.Form.Data;
     $.each(columns, function(field, specs){
+      if(columns[field]['required']) {
+        columns[field]['validator'] = requiredFieldValidator;
+      }
       if(columns[field]['editor'] == 1024) {
         columns[field]['formatter'] = Slick.Formatters.Currency;
       }
@@ -147,9 +151,24 @@ cj(function ($) {
     //this line probably applies only if we switch to RowSelectionModel
     // which I tried because of the sync fn per below but not working
     //https://github.com/mleibman/SlickGrid/wiki/DataView
-    grid.onSelectedRowsChanged.subscribe(function() {
-      console.log(grid.getSelectedRows()); }
-    );
+    grid.onSelectedRowsChanged.subscribe(function(e, args) {
+      var rowID = grid.getSelectedRows();
+      var columns = grid.getColumns();
+      var cellCSS = [];
+      $.each(columns, function(columnID, specs){
+        if(specs.required) {
+          var cell = grid.getCellNode(rowID, columnID);
+          if($(cell).text()) {
+          }
+          else {
+            cellCSS[specs.id] = 'invalid';
+          }
+        }
+      });
+      var rowCSS = {};
+      rowCSS[rowID] = cellCSS;
+      grid.setCellCssStyles("invalid", rowCSS);
+    });
 
     grid.onCellChange.subscribe(function (e, args) {
       var cell = grid.getCellFromEvent(e);
