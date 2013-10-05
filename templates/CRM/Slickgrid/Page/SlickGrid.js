@@ -188,7 +188,6 @@ cj(function ($) {
     grid.onAddNewRow.subscribe(function (e, args) {
       var item = args.item;
       item["id"] = dataView.getLength() + 1;
-      console.log(item);
       var params = item;
       //fix me - once we start deleting rows need the max id
       params['grid_id'] = CRM.form.grid_id;
