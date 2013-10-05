@@ -169,7 +169,6 @@ cj(function ($) {
       if(cellCSS) {
         rowCSS[rowID] = cellCSS;
         grid.setCellCssStyles("invalid", rowCSS);
-        args.row.cssClasses('invalid');
       }
     });
 
