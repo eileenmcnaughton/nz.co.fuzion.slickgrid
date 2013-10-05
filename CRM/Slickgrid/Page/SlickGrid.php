@@ -32,7 +32,7 @@ class CRM_Slickgrid_Page_SlickGrid extends CRM_Core_Page {
     ->addScriptFile('nz.co.fuzion.slickgrid', 'js/AutoComplete.js', 17)
     ->addStyleFile('nz.co.fuzion.slickgrid', 'css/inlineEditor.css', 18)
     ->addScriptFile('civicrm', 'js/jquery/jquery.crmeditable.js', 19)
-    ->addScriptURL('http://maps.googleapis.com/maps/api/js?libraries=places&sensor=false', 200);
+    ->addScriptURL('https://maps.googleapis.com/maps/api/js?libraries=places&sensor=false', 200);
     ;
     $this->id = CRM_Utils_Request::retrieve('gridid', 'String');
     if(empty($this->id)) {
