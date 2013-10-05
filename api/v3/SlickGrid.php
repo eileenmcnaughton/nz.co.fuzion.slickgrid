@@ -9,12 +9,17 @@ function civicrm_api3_slick_grid_create($params) {
   //@todo get rid of all this crap & sort out the escaping
   $exists = CRM_Core_DAO::singleValueQuery(" SELECT count(*) FROM $tempTable WHERE grid_id = " . $id);
   $dataExists  = false;
-  $updatesql = array();
+  $updatesql = $dbFields  = array();
+  $fieldCount = 0;
   foreach ($fields as $field => $value) {
    if(!empty($value)) {
     $dataExists = TRUE;
    }
-   $updatesql[] =  str_replace('-', '__', $field) . " = '$value' ";
+   $fieldCount ++;
+   $dbFields[$fieldCount] = array($value, 'String');
+   //@todo we need a proper BAO here & the $field needs to be escaped
+   $updatesql[] =  str_replace('-', '__', $field) . " = %$fieldCount ";
+   $percentString[] = '%' . $fieldCount;
   }
   if($exists) {
     $sql = " UPDATE $tempTable SET " . implode(',', $updatesql) . " WHERE grid_id = " . $id;
@@ -23,11 +28,11 @@ function civicrm_api3_slick_grid_create($params) {
   if(!dataExists) {
     return civicrm_api3_create_success(array($params['id'] => array('id' => $params['id'] )));
   }
-    $sql = " INSERT INTO $tempTable ("
+  $sql = " INSERT INTO $tempTable ("
       . str_replace('-', '__', implode(',', array_keys($fields))) . ') '
-      . "values('" . implode("','", $fields) . "')";
+      . "values(" . implode(',', $percentString) . ")";
   }
-  CRM_Core_DAO::executeQuery($sql);
+  CRM_Core_DAO::executeQuery($sql, $dbFields);
 
   return civicrm_api3_create_success(array($params['id'] => array('id' => $params['id'] )));
 
